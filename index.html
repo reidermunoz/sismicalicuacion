@@ -1,13 +1,1434 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Mi primera página</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Licuación de Suelos - Universidad del Valle</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-bg: #f9fafb;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 100% 0; }
+        }
+        
+        .header h1 {
+            color: var(--dark-color);
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--primary-color);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary-color), #22c55e);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #f87171);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .layer-card {
+            background: linear-gradient(135deg, #f3f4f6, #ffffff);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid #e5e7eb;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .layer-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.1);
+        }
+        
+        .layer-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: var(--white);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+        
+        .layer-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .results-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .results-table th {
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            color: var(--white);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .results-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-safe {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-warning {
+            background: #fed7aa;
+            color: #92400e;
+        }
+        
+        .status-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .chart-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            height: 500px;
+            position: relative;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, var(--white), #f9fafb);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        .summary-card .label {
+            color: #6b7280;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .summary-card i {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            opacity: 0.2;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            color: #92400e;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background: var(--dark-color);
+            color: var(--white);
+            text-align: center;
+            border-radius: 10px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 0.95;
+        }
+        
+        .footer {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            color: #6b7280;
+            box-shadow: var(--shadow);
+            margin-top: 40px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--danger-color);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e5e7eb;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            width: 0%;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .btn-group, .no-print {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-
-  <h1>¡Hola, mundo!</h1>
-  <p>Este es mi primer párrafo.</p>
-  <a href="https://www.ejemplo.com">Visita un enlace de ejemplo</a>
-
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-mountain"></i> Análisis de Licuación de Suelos</h1>
+            <div class="subtitle">
+                <i class="fas fa-university"></i> Universidad del Valle - Método Simplificado de Seed e Idriss
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="panel">
+                <h2 class="section-title">
+                    <i class="fas fa-cogs"></i> Parámetros de Entrada
+                </h2>
+                
+                <!-- General Parameters -->
+                <div class="form-group">
+                    <label for="nfi">
+                        Nivel Freático Inicial (m)
+                        <span class="tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltiptext">Profundidad del nivel de agua inicial en metros</span>
+                        </span>
+                    </label>
+                    <input type="number" id="nfi" step="0.1" value="2.0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nfe">
+                        Nivel Freático Estimado (m)
+                        <span class="tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltiptext">Profundidad esperada del nivel de agua durante el sismo</span>
+                        </span>
+                    </label>
+                    <input type="number" id="nfe" step="0.1" value="1.5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="diam">Diámetro de Perforación (mm)</label>
+                    <select id="diam">
+                        <option value="100">100 mm</option>
+                        <option value="115" selected>115 mm</option>
+                        <option value="150">150 mm</option>
+                        <option value="200">200 mm</option>
+                    </select>
+                </div>
+                
+                <h3 class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-wave-square"></i> Parámetros Sísmicos
+                </h3>
+                
+                <div class="form-group">
+                    <label for="mw">
+                        Magnitud del Sismo (Mw)
+                        <span class="tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltiptext">Magnitud momento del sismo de diseño (5.0 - 9.0)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="mw" min="5" max="9" step="0.1" value="7.5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="amax">
+                        Aceleración Máxima (g)
+                        <span class="tooltip">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltiptext">Aceleración máxima del terreno como fracción de g (0.1 - 1.0)</span>
+                        </span>
+                    </label>
+                    <input type="number" id="amax" min="0.1" max="1" step="0.05" value="0.3">
+                </div>
+                
+                <!-- Layers Section -->
+                <h3 class="section-title" style="margin-top: 30px;">
+                    <i class="fas fa-layer-group"></i> Capas de Suelo
+                </h3>
+                
+                <div class="form-group">
+                    <label for="numCapas">Número de Capas</label>
+                    <input type="number" id="numCapas" min="1" max="10" value="3">
+                </div>
+                
+                <button class="btn btn-primary" onclick="generarCapas()">
+                    <i class="fas fa-plus-circle"></i> Generar Capas
+                </button>
+                
+                <div id="layersContainer" style="margin-top: 20px;"></div>
+                
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="calcular()">
+                        <i class="fas fa-calculator"></i> Calcular
+                    </button>
+                    <button class="btn btn-danger" onclick="limpiar()">
+                        <i class="fas fa-trash"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div>
+                <div class="summary-cards" id="summaryCards" style="display: none;">
+                    <div class="summary-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="label">Capas con Riesgo</div>
+                        <div class="value" id="capasRiesgo">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="label">Factor Seguridad Min.</div>
+                        <div class="value" id="fsMinimo">-</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-ruler-vertical"></i>
+                        <div class="label">Profundidad Máxima</div>
+                        <div class="value" id="profMax">-</div>
+                    </div>
+                    <div class="summary-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="label">MSF</div>
+                        <div class="value" id="msfValue">-</div>
+                    </div>
+                </div>
+                
+                <!-- Alerts Container -->
+                <div id="alertsContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; color: var(--primary-color); font-weight: 600;">Calculando...</p>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i> Resultados del Análisis
+            </h2>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0%</div>
+            </div>
+            
+            <!-- Results Table -->
+            <div style="overflow-x: auto;">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Capa</th>
+                            <th>USCS</th>
+                            <th>Prof. (m)</th>
+                            <th>γ (kN/m³)</th>
+                            <th>Finos (%)</th>
+                            <th>N-SPT</th>
+                            <th>N1(60)</th>
+                            <th>σv (kPa)</th>
+                            <th>σ'v (kPa)</th>
+                            <th>CSR</th>
+                            <th>CRR</th>
+                            <th>FS</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+            </div>
+            
+            <!-- Export Buttons -->
+            <div class="btn-group" style="margin-top: 30px;">
+                <button class="btn btn-primary" onclick="exportarExcel()">
+                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                </button>
+                <button class="btn btn-primary" onclick="exportarPDF()">
+                    <i class="fas fa-file-pdf"></i> Exportar a PDF
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="charts-grid" id="chartsGrid" style="display: none;">
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i> Factor de Seguridad vs Profundidad
+                </h3>
+                <canvas id="fsChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-area"></i> CSR vs CRR
+                </h3>
+                <canvas id="csrCrrChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-bar"></i> Perfil SPT
+                </h3>
+                <canvas id="sptChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="section-title">
+                    <i class="fas fa-chart-line"></i> Esfuerzos Verticales
+                </h3>
+                <canvas id="stressChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Modal for detailed results -->
+        <div id="detailModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 class="section-title">
+                    <i class="fas fa-info-circle"></i> Detalles del Análisis
+                </h2>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><i class="fas fa-code"></i> Desarrollado con tecnología web moderna | 
+               <i class="fas fa-university"></i> Universidad del Valle | 
+               <i class="fas fa-calendar"></i> 2024</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Basado en el método simplificado de Seed e Idriss para análisis de licuación
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let layers = [];
+        let results = null;
+        let charts = {};
+        
+        // Generate layer inputs
+        function generarCapas() {
+            const numCapas = parseInt(document.getElementById('numCapas').value);
+            const container = document.getElementById('layersContainer');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= numCapas; i++) {
+                const layerCard = document.createElement('div');
+                layerCard.className = 'layer-card';
+                layerCard.innerHTML = `
+                    <div class="layer-number">${i}</div>
+                    <div class="layer-controls">
+                        <div class="form-group">
+                            <label>Clasificación USCS</label>
+                            <select id="uscs_${i}">
+                                <option value="ML-CL">ML-CL (Limo-Arcilla)</option>
+                                <option value="SM" selected>SM (Arena limosa)</option>
+                                <option value="SW">SW/SP-SM (Arena)</option>
+                                <option value="GW">GW/GP-GM (Grava)</option>
+                                <option value="SC">SC (Arena arcillosa)</option>
+                                <option value="CH">CH (Arcilla alta plasticidad)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Profundidad (m)</label>
+                            <input type="number" id="prof_${i}" step="0.5" value="${i * 3}">
+                        </div>
+                        <div class="form-group">
+                            <label>Peso Unitario (kN/m³)</label>
+                            <input type="number" id="ghum_${i}" step="0.1" value="18.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Contenido Finos (%)</label>
+                            <input type="number" id="finos_${i}" min="0" max="100" value="15">
+                        </div>
+                        <div class="form-group">
+                            <label>Índice Plasticidad (IP)</label>
+                            <input type="number" id="ip_${i}" min="0" max="100" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>N-SPT</label>
+                            <input type="number" id="nspt_${i}" min="0" max="50" value="${10 + i * 3}">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(layerCard);
+            }
+        }
+        
+        // Main calculation function
+        function calcular() {
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            
+            // Clear previous results
+            document.getElementById('alertsContainer').innerHTML = '';
+            
+            setTimeout(() => {
+                try {
+                    // Get input parameters
+                    const nfi = parseFloat(document.getElementById('nfi').value);
+                    const nfe = parseFloat(document.getElementById('nfe').value);
+                    const diam = parseFloat(document.getElementById('diam').value);
+                    const mw = parseFloat(document.getElementById('mw').value);
+                    const amax_input = parseFloat(document.getElementById('amax').value);
+                    
+                    // Get layers data
+                    const numCapas = parseInt(document.getElementById('numCapas').value);
+                    layers = [];
+                    
+                    for (let i = 1; i <= numCapas; i++) {
+                        layers.push({
+                            capa: i,
+                            uscs: document.getElementById(`uscs_${i}`).value,
+                            prof: parseFloat(document.getElementById(`prof_${i}`).value),
+                            ghum: parseFloat(document.getElementById(`ghum_${i}`).value),
+                            finos: parseFloat(document.getElementById(`finos_${i}`).value),
+                            ip: parseFloat(document.getElementById(`ip_${i}`).value) || 0,
+                            nspt: parseFloat(document.getElementById(`nspt_${i}`).value)
+                        });
+                    }
+                    
+                    // Sort layers by depth
+                    layers.sort((a, b) => a.prof - b.prof);
+                    
+                    // Constants
+                    const g = 9.81;
+                    const amax = amax_input * 1.2; // Amplification factor
+                    
+                    // Calculate MSF
+                    const MSF = Math.pow(10, 2.24) / Math.pow(mw, 2.56);
+                    
+                    // Initialize results array
+                    results = {
+                        layers: [],
+                        mw: mw,
+                        amax: amax,
+                        msf: MSF,
+                        nfi: nfi,
+                        nfe: nfe
+                    };
+                    
+                    // Calculate for each layer
+                    let so_prev = 0;
+                    let capasLicuables = 0;
+                    let fsMinimo = 999;
+                    
+                    for (let i = 0; i < layers.length; i++) {
+                        const layer = layers[i];
+                        
+                        // Calculate a and b coefficients for fines correction
+                        let a, b;
+                        if (layer.finos <= 5) {
+                            a = 0;
+                            b = 1;
+                        } else if (layer.finos <= 35) {
+                            a = Math.exp(1.76 - (190 / Math.pow(layer.finos, 2)));
+                            b = 0.99 + (Math.pow(layer.finos, 1.5) / 1000);
+                        } else {
+                            a = 5;
+                            b = 1.2;
+                        }
+                        
+                        // Energy ratio (typically 50-80%)
+                        const CE = 50;
+                        
+                        // Total vertical stress
+                        const so = i === 0 ? 
+                            layer.prof * layer.ghum : 
+                            so_prev + (layer.prof - layers[i-1].prof) * layer.ghum;
+                        
+                        // Pore pressure with estimated water table
+                        const m2 = nfe < layer.prof ? (layer.prof - nfe) * g : 0;
+                        
+                        // Effective vertical stress
+                        const so_prima = so - m2;
+                        
+                        // CN (Overburden correction factor)
+                        let CN = Math.sqrt(100 / so_prima);
+                        if (CN > 2) CN = 2;
+                        
+                        // CB (Borehole diameter correction)
+                        let CB;
+                        if (diam < 115) CB = 1;
+                        else if (diam < 150) CB = 1.05;
+                        else CB = 1.15;
+                        
+                        // CP (Fines and plasticity correction)
+                        const CP = (layer.finos > 15 && layer.ip > 15) ? 1.1 : 1;
+                        
+                        // Corrected SPT
+                        const N1_60 = Math.round(layer.nspt * (CE/60) * CN * CB * CP + a);
+                        
+                        // rd (Depth reduction factor)
+                        let rd;
+                        if (layer.prof < 9.15) {
+                            rd = 1 - 0.00765 * layer.prof;
+                        } else if (layer.prof < 15) {
+                            rd = 1.174 - 0.0267 * layer.prof;
+                        } else if (layer.prof < 30) {
+                            rd = 0.744 - 0.008 * layer.prof;
+                        } else {
+                            rd = 0.5;
+                        }
+                        
+                        // CSR (Cyclic Stress Ratio)
+                        const CSR = 0.65 * amax * (so / so_prima) * rd;
+                        
+                        // CRR (Cyclic Resistance Ratio) - Seed and Idriss curve
+                        let CRR;
+                        if (N1_60 < 30) {
+                            const N = N1_60;
+                            const numerator = (1/34) + (1/135)*N + (50*50/(10*45*45))*N*N - (1/200)*N*N*N;
+                            const denominator = 1;
+                            CRR = MSF * numerator / denominator;
+                        } else {
+                            CRR = 0.5;
+                        }
+                        
+                        // Evaluation and Safety Factor
+                        let comentario;
+                        let FS;
+                        
+                        const condicion1 = layer.prof > nfe;
+                        const condicion2 = layer.finos < 50;
+                        const condicion3 = layer.ip < 35;
+                        
+                        if (condicion1 && condicion2 && condicion3) {
+                            if (CRR > CSR) {
+                                comentario = 'No Susceptible';
+                            } else {
+                                comentario = 'Susceptible a Licuación';
+                                capasLicuables++;
+                            }
+                        } else {
+                            comentario = 'No Susceptible';
+                        }
+                        
+                        if (comentario === 'No Susceptible' && CRR < CSR) {
+                            FS = 2;
+                        } else {
+                            FS = CRR / CSR;
+                        }
+                        
+                        if (FS < fsMinimo) fsMinimo = FS;
+                        
+                        // Store results
+                        results.layers.push({
+                            ...layer,
+                            a: a,
+                            b: b,
+                            CE: CE,
+                            CN: CN,
+                            CB: CB,
+                            CP: CP,
+                            N1_60: N1_60,
+                            so: so,
+                            so_prima: so_prima,
+                            rd: rd,
+                            CSR: CSR,
+                            CRR: CRR,
+                            FS: FS,
+                            comentario: comentario
+                        });
+                        
+                        so_prev = so;
+                    }
+                    
+                    // Update progress bar
+                    animateProgressBar(100);
+                    
+                    // Display results
+                    displayResults(results);
+                    
+                    // Update summary cards
+                    document.getElementById('summaryCards').style.display = 'grid';
+                    document.getElementById('capasRiesgo').textContent = capasLicuables;
+                    document.getElementById('fsMinimo').textContent = fsMinimo.toFixed(2);
+                    document.getElementById('profMax').textContent = Math.max(...layers.map(l => l.prof)) + ' m';
+                    document.getElementById('msfValue').textContent = MSF.toFixed(3);
+                    
+                    // Show alerts
+                    if (capasLicuables > 0) {
+                        showAlert('danger', `⚠️ ADVERTENCIA: Se detectaron ${capasLicuables} capa(s) con riesgo de licuación. Se recomienda análisis geotécnico detallado.`);
+                    } else {
+                        showAlert('success', '✅ No se detectó riesgo de licuación en las capas analizadas.');
+                    }
+                    
+                    // Create charts
+                    createCharts(results);
+                    
+                    // Show results sections
+                    document.getElementById('resultsSection').style.display = 'block';
+                    document.getElementById('chartsGrid').style.display = 'grid';
+                    
+                } catch (error) {
+                    console.error('Error en cálculo:', error);
+                    showAlert('danger', '❌ Error en el cálculo. Por favor revise los datos ingresados.');
+                }
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+            }, 500);
+        }
+        
+        // Display results in table
+        function displayResults(results) {
+            const tbody = document.getElementById('resultsTableBody');
+            tbody.innerHTML = '';
+            
+            results.layers.forEach((layer, index) => {
+                const row = document.createElement('tr');
+                
+                let statusClass, statusText;
+                if (layer.FS < 1.0) {
+                    statusClass = 'status-danger';
+                    statusText = 'PELIGRO';
+                } else if (layer.FS < 1.5) {
+                    statusClass = 'status-warning';
+                    statusText = 'PRECAUCIÓN';
+                } else {
+                    statusClass = 'status-safe';
+                    statusText = 'SEGURO';
+                }
+                
+                row.innerHTML = `
+                    <td>${layer.capa}</td>
+                    <td>${layer.uscs}</td>
+                    <td>${layer.prof.toFixed(2)}</td>
+                    <td>${layer.ghum.toFixed(1)}</td>
+                    <td>${layer.finos.toFixed(1)}</td>
+                    <td>${layer.nspt}</td>
+                    <td>${layer.N1_60}</td>
+                    <td>${layer.so.toFixed(1)}</td>
+                    <td>${layer.so_prima.toFixed(1)}</td>
+                    <td>${layer.CSR.toFixed(4)}</td>
+                    <td>${layer.CRR.toFixed(4)}</td>
+                    <td><strong>${layer.FS.toFixed(3)}</strong></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Create charts
+        function createCharts(results) {
+            const depths = results.layers.map(l => -l.prof);
+            
+            // Destroy existing charts if any
+            Object.values(charts).forEach(chart => chart.destroy());
+            charts = {};
+            
+            // 1. Safety Factor Chart
+            const fsCtx = document.getElementById('fsChart').getContext('2d');
+            charts.fsChart = new Chart(fsCtx, {
+                type: 'line',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'Factor de Seguridad',
+                        data: results.layers.map(l => l.FS),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: 'FS = 1.0',
+                        data: depths.map(() => 1),
+                        borderColor: '#ef4444',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Profundidad (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Factor de Seguridad'
+                            },
+                            min: 0,
+                            max: Math.max(3, ...results.layers.map(l => l.FS))
+                        }
+                    }
+                }
+            });
+            
+            // 2. CSR vs CRR Chart
+            const csrCrrCtx = document.getElementById('csrCrrChart').getContext('2d');
+            charts.csrCrrChart = new Chart(csrCrrCtx, {
+                type: 'line',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'CSR (Demanda)',
+                        data: results.layers.map(l => l.CSR),
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }, {
+                        label: 'CRR (Capacidad)',
+                        data: results.layers.map(l => l.CRR),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Profundidad (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'CSR / CRR'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 3. SPT Profile Chart
+            const sptCtx = document.getElementById('sptChart').getContext('2d');
+            charts.sptChart = new Chart(sptCtx, {
+                type: 'line',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'N-SPT Original',
+                        data: results.layers.map(l => l.nspt),
+                        borderColor: '#6b7280',
+                        backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                        borderWidth: 3,
+                        fill: false
+                    }, {
+                        label: 'N1(60) Corregido',
+                        data: results.layers.map(l => l.N1_60),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Profundidad (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Valor N'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 4. Stress Profile Chart
+            const stressCtx = document.getElementById('stressChart').getContext('2d');
+            charts.stressChart = new Chart(stressCtx, {
+                type: 'line',
+                data: {
+                    labels: depths,
+                    datasets: [{
+                        label: 'σv Total',
+                        data: results.layers.map(l => l.so),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 3,
+                        fill: false
+                    }, {
+                        label: "σ'v Efectivo",
+                        data: results.layers.map(l => l.so_prima),
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        borderWidth: 3,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Profundidad (m)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Esfuerzo (kPa)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Show alert
+        function showAlert(type, message) {
+            const alertsContainer = document.getElementById('alertsContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas ${type === 'danger' ? 'fa-exclamation-triangle' : 
+                             type === 'warning' ? 'fa-exclamation-circle' : 
+                             'fa-check-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alertsContainer.appendChild(alertDiv);
+        }
+        
+        // Animate progress bar
+        function animateProgressBar(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= percentage) {
+                    clearInterval(interval);
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                    progressBar.textContent = width + '%';
+                }
+            }, 10);
+        }
+        
+        // Export to Excel
+        function exportarExcel() {
+            if (!results) return;
+            
+            // Create CSV content
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ANÁLISIS DE LICUACIÓN - UNIVERSIDAD DEL VALLE\n\n";
+            csvContent += `Magnitud Sismo (Mw):,${results.mw}\n`;
+            csvContent += `Aceleración Máxima:,${results.amax.toFixed(3)}g\n`;
+            csvContent += `MSF:,${results.msf.toFixed(3)}\n`;
+            csvContent += `Nivel Freático Inicial:,${results.nfi}m\n`;
+            csvContent += `Nivel Freático Estimado:,${results.nfe}m\n\n`;
+            
+            csvContent += "Capa,USCS,Prof(m),γ(kN/m³),Finos(%),IP(%),N-SPT,N1(60),σv(kPa),σ'v(kPa),CSR,CRR,FS,Estado\n";
+            
+            results.layers.forEach(layer => {
+                const estado = layer.FS < 1 ? 'PELIGRO' : layer.FS < 1.5 ? 'PRECAUCIÓN' : 'SEGURO';
+                csvContent += `${layer.capa},${layer.uscs},${layer.prof},${layer.ghum},${layer.finos},${layer.ip},` +
+                             `${layer.nspt},${layer.N1_60},${layer.so.toFixed(1)},${layer.so_prima.toFixed(1)},` +
+                             `${layer.CSR.toFixed(4)},${layer.CRR.toFixed(4)},${layer.FS.toFixed(3)},${estado}\n`;
+            });
+            
+            // Download file
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `licuacion_analisis_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAlert('success', '✅ Archivo Excel exportado correctamente');
+        }
+        
+        // Export to PDF (basic implementation)
+        function exportarPDF() {
+            showAlert('warning', '📄 Para exportar a PDF, use la función de impresión del navegador y seleccione "Guardar como PDF"');
+            window.print();
+        }
+        
+        // Clear all
+        function limpiar() {
+            if (confirm('¿Está seguro de limpiar todos los datos?')) {
+                document.getElementById('nfi').value = '2.0';
+                document.getElementById('nfe').value = '1.5';
+                document.getElementById('diam').value = '115';
+                document.getElementById('mw').value = '7.5';
+                document.getElementById('amax').value = '0.3';
+                document.getElementById('numCapas').value = '3';
+                document.getElementById('layersContainer').innerHTML = '';
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('chartsGrid').style.display = 'none';
+                document.getElementById('summaryCards').style.display = 'none';
+                document.getElementById('alertsContainer').innerHTML = '';
+                
+                // Destroy charts
+                Object.values(charts).forEach(chart => chart.destroy());
+                charts = {};
+                
+                results = null;
+                
+                showAlert('success', '✅ Formulario limpiado correctamente');
+            }
+        }
+        
+        // Modal functionality
+        const modal = document.getElementById('detailModal');
+        const span = document.getElementsByClassName('close')[0];
+        
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            generarCapas();
+        }
+    </script>
 </body>
 </html>
