@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Licuación de Suelos - Seed & Idriss</title>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-size: 0.95em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: var(--bg-color);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-dark);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .layer-item {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .layer-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .layer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .layer-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--primary-color);
+        }
+
+        .layer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-table th {
+            background: var(--bg-color);
+            font-weight: 600;
+            color: var(--text-dark);
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tr:hover {
+            background: var(--bg-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-safe {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-neutral {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .chart-container {
+            height: 500px;
+            margin-top: 20px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .file-upload {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-color);
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: white;
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+
+        .file-upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .layer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .scroll-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: var(--bg-color);
+            border-radius: 4px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--text-light);
+            border-radius: 4px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏗️ Análisis de Licuación de Suelos</h1>
+            <p>Método de Seed & Idriss Modificado</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Input Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span>📊</span> Datos de Entrada
+                    </h2>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('manual')">Manual</button>
+                    <button class="tab" onclick="switchTab('file')">Cargar Archivo</button>
+                </div>
+
+                <!-- Manual Input Tab -->
+                <div id="manual-tab" class="tab-content active">
+                    <!-- Seismic Parameters -->
+                    <div class="form-group">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-color);">Parámetros Sísmicos</h3>
+                        <div class="input-group">
+                            <div>
+                                <label class="form-label">Magnitud (Mw)</label>
+                                <input type="number" id="mw" class="form-input" value="6.5" step="0.1" min="5" max="9">
+                            </div>
+                            <div>
+                                <label class="form-label">Aceleración máxima (g)</label>
+                                <input type="number" id="amax" class="form-input" value="0.36" step="0.01" min="0" max="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soil Profile -->
+                    <div class="form-group">
+                        <h3 style="margin-bottom: 15px; color: var(--primary-color);">Perfil del Suelo</h3>
+                        <label class="form-label">Nivel Freático (m)</label>
+                        <input type="number" id="nfreatico" class="form-input" value="0.5" step="0.1" min="0">
+                    </div>
+
+                    <!-- Layers -->
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="color: var(--primary-color);">Capas de Suelo</h3>
+                            <button class="btn btn-success" onclick="addLayer()">+ Añadir Capa</button>
+                        </div>
+                        <div id="layers-container" class="scroll-container"></div>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="calcularLicuacion()">
+                        🔬 Calcular Análisis
+                    </button>
+                </div>
+
+                <!-- File Input Tab -->
+                <div id="file-tab" class="tab-content">
+                    <div class="alert alert-info">
+                        <span>ℹ️</span>
+                        <div>
+                            <strong>Formato del archivo TXT:</strong><br>
+                            Línea 1: Mw, Amax<br>
+                            Línea 2: Nivel freático<br>
+                            Líneas siguientes: Profundidad, Densidad, Finos(%), IP(%), N-SPT
+                        </div>
+                    </div>
+
+                    <div class="file-upload" id="file-upload-zone">
+                        <div class="file-upload-icon">📁</div>
+                        <h3 style="margin-bottom: 10px;">Arrastra un archivo TXT aquí</h3>
+                        <p style="color: var(--text-light); margin-bottom: 15px;">o haz clic para seleccionar</p>
+                        <input type="file" id="file-input" accept=".txt" style="display: none;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
+                            Seleccionar Archivo
+                        </button>
+                    </div>
+
+                    <div class="btn-group" style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="descargarPlantilla()">
+                            📥 Descargar Plantilla
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span>📈</span> Resultados del Análisis
+                    </h2>
+                    <button class="btn btn-success hidden" id="export-btn" onclick="exportarResultados()">
+                        💾 Exportar Resultados
+                    </button>
+                </div>
+
+                <div id="results-container">
+                    <div style="text-align: center; padding: 60px 20px; color: var(--text-light);">
+                        <div style="font-size: 4em; margin-bottom: 20px;">📊</div>
+                        <h3>No hay resultados todavía</h3>
+                        <p>Ingresa los datos y haz clic en "Calcular Análisis"</p>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Procesando análisis...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div id="charts-section" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span>📉</span> Gráficos de Análisis
+                    </h2>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container" id="chart-esfuerzos"></div>
+                    <div class="chart-container" id="chart-csr-crr"></div>
+                    <div class="chart-container" id="chart-fs"></div>
+                    <div class="chart-container" id="chart-nspt"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const COEF = {
+            aa: 0.048,
+            bb: -0.1248,
+            cc: -0.004721,
+            dd: 0.009578,
+            ee: 0.0006136,
+            ff: -0.0003285,
+            gg: -0.00001673,
+            hh: 0.000003714
+        };
+
+        const RO_AGUA = 9.81; // kN/m³
+        const CE = 50; // Hammer efficiency %
+
+        let layerCount = 0;
+        let analysisResults = null;
+
+        // Initialize with one layer
+        window.onload = function() {
+            addLayer();
+            setupFileUpload();
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // Add layer
+        function addLayer() {
+            layerCount++;
+            const container = document.getElementById('layers-container');
+            
+            const layerDiv = document.createElement('div');
+            layerDiv.className = 'layer-item';
+            layerDiv.id = 'layer-' + layerCount;
+            
+            layerDiv.innerHTML = `
+                <div class="layer-header">
+                    <span class="layer-title">Capa ${layerCount}</span>
+                    <button class="btn btn-danger" onclick="removeLayer(${layerCount})" style="padding: 6px 12px;">
+                        ✕ Eliminar
+                    </button>
+                </div>
+                <div class="layer-grid">
+                    <div>
+                        <label class="form-label">Profundidad (m)</label>
+                        <input type="number" class="form-input layer-prof" step="0.1" min="0" value="${layerCount * 2}">
+                    </div>
+                    <div>
+                        <label class="form-label">Densidad (kN/m³)</label>
+                        <input type="number" class="form-input layer-density" step="0.1" min="0" value="18.5">
+                    </div>
+                    <div>
+                        <label class="form-label">Finos (%)</label>
+                        <input type="number" class="form-input layer-finos" step="1" min="0" max="100" value="87.69513">
+                    </div>
+                    <div>
+                        <label class="form-label">IP (%)</label>
+                        <input type="number" class="form-input layer-ip" step="1" min="0" max="100" value="16.80976">
+                    </div>
+                    <div>
+                        <label class="form-label">N-SPT</label>
+                        <input type="number" class="form-input layer-nspt" step="1" min="0" value="6">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(layerDiv);
+        }
+
+        // Remove layer
+        function removeLayer(id) {
+            const layer = document.getElementById('layer-' + id);
+            if (layer) {
+                layer.remove();
+            }
+        }
+
+        // Get layer data
+        function getLayersData() {
+            const layers = [];
+            document.querySelectorAll('.layer-item').forEach(layer => {
+                layers.push({
+                    prof: parseFloat(layer.querySelector('.layer-prof').value),
+                    density: parseFloat(layer.querySelector('.layer-density').value),
+                    finos: parseFloat(layer.querySelector('.layer-finos').value),
+                    ip: parseFloat(layer.querySelector('.layer-ip').value),
+                    nspt: parseFloat(layer.querySelector('.layer-nspt').value)
+                });
+            });
+            return layers.sort((a, b) => a.prof - b.prof);
+        }
+
+        // Main calculation function
+        function calcularLicuacion() {
+            try {
+                // Get input data
+                const Mw = parseFloat(document.getElementById('mw').value);
+                const Amax = parseFloat(document.getElementById('amax').value);
+                const Nfreatico = parseFloat(document.getElementById('nfreatico').value);
+                const layers = getLayersData();
+
+                if (layers.length === 0) {
+                    alert('Por favor, añade al menos una capa de suelo.');
+                    return;
+                }
+
+                // Show loading
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('results-container').innerHTML = '';
+
+                // Perform calculations
+                setTimeout(() => {
+                    const results = performAnalysis(Mw, Amax, Nfreatico, layers);
+                    analysisResults = results;
+                    
+                    // Display results
+                    displayResults(results);
+                    displayCharts(results, Nfreatico);
+                    
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('export-btn').classList.remove('hidden');
+                    document.getElementById('charts-section').classList.remove('hidden');
+                }, 500);
+
+            } catch (error) {
+                console.error('Error en el cálculo:', error);
+                alert('Error en el cálculo: ' + error.message);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Perform analysis calculations
+        function performAnalysis(Mw, Amax, Nfreatico, layers) {
+            const N = layers.length;
+            const results = {
+                Mw: Mw,
+                Amax: Amax,
+                Nfreatico: Nfreatico,
+                Msf: Math.pow(10, 2.24) / Math.pow(Mw, 2.56),
+                layers: []
+            };
+
+            // Calculate for each layer
+            for (let i = 0; i < N; i++) {
+                const layer = layers[i];
+                const espesor = i === 0 ? layer.prof : layer.prof - layers[i-1].prof;
+                
+                // Total stress
+                const sigma = i === 0 ? 
+                    layer.density * layer.prof : 
+                    results.layers[i-1].sigma + layer.density * espesor;
+                
+                // Pore pressure
+                const u = layer.prof > Nfreatico ? 
+                    (layer.prof - Nfreatico) * RO_AGUA : 0;
+                
+                // Effective stress
+                const sigmaPrima = sigma - u;
+                
+                // Stress reduction factor
+                const rd = calcular_rd(layer.prof);
+                
+                // CN factor
+                const CN = Math.min(Math.sqrt(100 / sigmaPrima), 2);
+                
+                // CP factor
+                const CP = (layer.ip > 15 && layer.finos > 15) ? 1.1 : 1;
+                
+                // Beta and Alpha
+                const Beta = calcular_Beta(layer.finos);
+                const alpha = calcular_alpha(layer.finos);
+                
+                // N1,60
+                const N1_60 = Math.round(layer.nspt * (CE / 60) * CN * Beta * CP + alpha);
+                
+                // CSR
+                const CSR = 0.65 * Amax * (sigma / sigmaPrima) * rd;
+                
+                // CRR
+                const CRR = calcular_CRR(N1_60, results.Msf);
+                
+                // Safety factor
+                const fs = CRR / CSR;
+                
+                // Evaluation
+                const resultado = evaluar_licuacion(layer, Nfreatico, CRR, CSR);
+                
+                results.layers.push({
+                    num: i + 1,
+                    prof: layer.prof,
+                    density: layer.density,
+                    finos: layer.finos,
+                    ip: layer.ip,
+                    nspt: layer.nspt,
+                    espesor: espesor,
+                    sigma: sigma,
+                    u: u,
+                    sigmaPrima: sigmaPrima,
+                    rd: rd,
+                    CN: CN,
+                    CP: CP,
+                    Beta: Beta,
+                    alpha: alpha,
+                    N1_60: N1_60,
+                    CSR: CSR,
+                    CRR: CRR,
+                    fs: fs,
+                    resultado: resultado
+                });
+            }
+
+            return results;
+        }
+
+        // Calculation functions
+        function calcular_rd(prof) {
+            if (prof < 1.5) return 1.174 - 0.0267 * prof;
+            if (prof < 9.15) return 1 - 0.00765 * prof;
+            if (prof < 30) return 0.744 - 0.008 * prof;
+            return 0.5;
+        }
+
+        function calcular_Beta(finos) {
+            if (finos <= 5) return 1;
+            if (finos <= 35) return 0.99 + Math.pow(finos, 1.5) / 1000;
+            return 1.2;
+        }
+
+        function calcular_alpha(finos) {
+            if (finos <= 5) return 0;
+            if (finos <= 35) return Math.exp(1.76 - (190 / Math.pow(finos, 2)));
+            return 5;
+        }
+
+        function calcular_CRR(N1_60, Msf) {
+            if (N1_60 >= 30) return 0.5;
+            
+            const num = COEF.aa + COEF.cc * N1_60 + COEF.ee * Math.pow(N1_60, 2) + 
+                        COEF.gg * Math.pow(N1_60, 3);
+            const den = 1 + COEF.bb * N1_60 + COEF.dd * Math.pow(N1_60, 2) + 
+                        COEF.ff * Math.pow(N1_60, 3) + COEF.hh * Math.pow(N1_60, 4);
+            
+            return Msf * (num / den);
+        }
+
+        function evaluar_licuacion(layer, Nfreatico, CRR, CSR) {
+            const bajo_nf = layer.prof > Nfreatico;
+            const finos_bajos = layer.finos < 50;
+            const ip_bajo = layer.ip < 35;
+            
+            if (bajo_nf && finos_bajos && ip_bajo) {
+                return CRR > CSR ? 'No licuable' : 'LICUABLE';
+            }
+            return 'No susceptible';
+        }
+
+        // Display results
+        function displayResults(results) {
+            let html = `
+                <div class="alert alert-success">
+                    <span>✓</span>
+                    <div>
+                        <strong>Análisis completado exitosamente</strong><br>
+                        MSF = ${results.Msf.toFixed(3)} | Amax = ${results.Amax}g | Mw = ${results.Mw}
+                    </div>
+                </div>
+
+                <div class="scroll-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Capa</th>
+                                <th>Prof. (m)</th>
+                                <th>γ (kN/m³)</th>
+                                <th>N-SPT</th>
+                                <th>N₁,₆₀</th>
+                                <th>σ (kPa)</th>
+                                <th>Miu (kPa)</th>
+                                <th>σ' (kPa)</th>
+                                <th>CSR</th>
+                                <th>CRR</th>
+                                <th>FS</th>
+                                <th>Resultado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            results.layers.forEach(layer => {
+                const statusClass = layer.resultado === 'LICUABLE' ? 'status-danger' : 
+                                   layer.resultado === 'No licuable' ? 'status-safe' : 'status-neutral';
+                
+                html += `
+                    <tr>
+                        <td><strong>${layer.num}</strong></td>
+                        <td>${layer.prof.toFixed(2)}</td>
+                        <td>${layer.density.toFixed(1)}</td>
+                        <td>${layer.nspt}</td>
+                        <td>${layer.N1_60}</td>
+                        <td>${layer.sigma.toFixed(1)}</td>
+                        <td>${layer.u.toFixed(1)}</td>
+                        <td>${layer.sigmaPrima.toFixed(1)}</td>
+                        <td>${layer.CSR.toFixed(3)}</td>
+                        <td>${layer.CRR.toFixed(3)}</td>
+                        <td><strong>${layer.fs.toFixed(2)}</strong></td>
+                        <td><span class="status-badge ${statusClass}">${layer.resultado}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('results-container').innerHTML = html;
+        }
+
+        // Display charts
+        function displayCharts(results, Nfreatico) {
+            const prof = results.layers.map(l => l.prof);
+            
+            // Chart 1: Stress profile
+            const trace1 = {
+                x: results.layers.map(l => l.sigma),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'σ (Total)',
+                line: { color: '#2563eb', width: 3 },
+                marker: { size: 8 }
+            };
+
+            const trace2 = {
+                x: results.layers.map(l => l.u),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'u (Poros)',
+                line: { color: '#06b6d4', width: 3 },
+                marker: { size: 8 }
+            };
+
+            const trace3 = {
+                x: results.layers.map(l => l.sigmaPrima),
+                y: prof,
+                mode: 'lines+markers',
+                name: "σ' (Efectivo)",
+                line: { color: '#ef4444', width: 3 },
+                marker: { size: 8 }
+            };
+
+            Plotly.newPlot('chart-esfuerzos', [trace1, trace2, trace3], {
+                title: 'Perfil de Esfuerzos',
+                xaxis: { title: 'Esfuerzo (kPa)' },
+                yaxis: { title: 'Profundidad (m)', autorange: 'reversed' },
+                shapes: [{
+                    type: 'line',
+                    x0: 0,
+                    x1: Math.max(...results.layers.map(l => l.sigma)),
+                    y0: Nfreatico,
+                    y1: Nfreatico,
+                    line: { color: 'black', width: 2, dash: 'dash' }
+                }]
+            });
+
+            // Chart 2: CSR vs CRR
+            const trace4 = {
+                x: results.layers.map(l => l.CSR),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'CSR',
+                line: { color: '#ef4444', width: 3 },
+                marker: { size: 8 }
+            };
+
+            const trace5 = {
+                x: results.layers.map(l => l.CRR),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'CRR',
+                line: { color: '#10b981', width: 3 },
+                marker: { size: 8 }
+            };
+
+            Plotly.newPlot('chart-csr-crr', [trace4, trace5], {
+                title: 'CSR vs CRR',
+                xaxis: { title: 'CSR / CRR' },
+                yaxis: { title: 'Profundidad (m)', autorange: 'reversed' },
+                shapes: [{
+                    type: 'line',
+                    x0: 0,
+                    x1: Math.max(...results.layers.map(l => Math.max(l.CSR, l.CRR))),
+                    y0: Nfreatico,
+                    y1: Nfreatico,
+                    line: { color: 'black', width: 2, dash: 'dash' }
+                }]
+            });
+
+            // Chart 3: Safety factor
+            const trace6 = {
+                x: results.layers.map(l => l.fs),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'FS',
+                line: { color: '#2563eb', width: 3 },
+                marker: { size: 8 }
+            };
+
+            Plotly.newPlot('chart-fs', [trace6], {
+                title: 'Factor de Seguridad',
+                xaxis: { title: 'Factor de Seguridad (FS)' },
+                yaxis: { title: 'Profundidad (m)', autorange: 'reversed' },
+                shapes: [
+                    {
+                        type: 'line',
+                        x0: 1.0,
+                        x1: 1.0,
+                        y0: 0,
+                        y1: Math.max(...prof),
+                        line: { color: 'red', width: 2, dash: 'dash' }
+                    },
+                    {
+                        type: 'line',
+                        x0: 0,
+                        x1: Math.max(...results.layers.map(l => l.fs)),
+                        y0: Nfreatico,
+                        y1: Nfreatico,
+                        line: { color: 'black', width: 2, dash: 'dash' }
+                    }
+                ]
+            });
+
+            // Chart 4: N-SPT
+            const trace7 = {
+                x: results.layers.map(l => l.nspt),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'N-SPT',
+                line: { color: '#64748b', width: 3 },
+                marker: { size: 8 }
+            };
+
+            const trace8 = {
+                x: results.layers.map(l => l.N1_60),
+                y: prof,
+                mode: 'lines+markers',
+                name: 'N₁,₆₀',
+                line: { color: '#2563eb', width: 3 },
+                marker: { size: 8 }
+            };
+
+            Plotly.newPlot('chart-nspt', [trace7, trace8], {
+                title: 'Perfil N-SPT Corregido',
+                xaxis: { title: 'Número de golpes' },
+                yaxis: { title: 'Profundidad (m)', autorange: 'reversed' },
+                shapes: [{
+                    type: 'line',
+                    x0: 0,
+                    x1: Math.max(...results.layers.map(l => Math.max(l.nspt, l.N1_60))),
+                    y0: Nfreatico,
+                    y1: Nfreatico,
+                    line: { color: 'black', width: 2, dash: 'dash' }
+                }]
+            });
+        }
+
+        // File upload functionality
+        function setupFileUpload() {
+            const fileInput = document.getElementById('file-input');
+            const uploadZone = document.getElementById('file-upload-zone');
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    parseFileContent(e.target.result);
+                    switchTab('manual');
+                    alert('Archivo cargado exitosamente. Revisa los datos y calcula el análisis.');
+                } catch (error) {
+                    alert('Revisa los datos (Manual) y calcula el análisis. ');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseFileContent(content) {
+            const lines = content.trim().split('\n');
+            
+            // Line 1: Mw, Amax
+            const [mw, amax] = lines[0].split(/[,\s]+/).map(parseFloat);
+            document.getElementById('mw').value = mw;
+            document.getElementById('amax').value = amax;
+            
+            // Line 2: Water table
+            const nfreatico = parseFloat(lines[1]);
+            document.getElementById('nfreatico').value = nfreatico;
+            
+            // Clear existing layers
+            document.getElementById('layers-container').innerHTML = '';
+            layerCount = 0;
+            
+            // Add layers from file
+            for (let i = 2; i < lines.length; i++) {
+                const data = lines[i].split(/[,\s]+/).map(parseFloat);
+                if (data.length >= 5) {
+                    addLayer();
+                    const layer = document.getElementById('layer-' + layerCount);
+                    layer.querySelector('.layer-prof').value = data[0];
+                    layer.querySelector('.layer-density').value = data[1];
+                    layer.querySelector('.layer-finos').value = data[2];
+                    layer.querySelector('.layer-ip').value = data[3];
+                    layer.querySelector('.layer-nspt').value = data[4];
+                }
+            }
+        }
+
+        // Download template
+        function descargarPlantilla() {
+            const template = `7.5 0.36
+2.0
+2.0 18.0 15 5 10
+4.0 19.0 20 8 15
+6.0 18.5 12 4 12
+8.0 20.0 25 10 18`;
+            
+            const blob = new Blob([template], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'plantilla_licuacion.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Export results
+        function exportarResultados() {
+            if (!analysisResults) return;
+            
+            let csv = 'Capa,Profundidad(m),Densidad(kN/m³),Finos(%),IP(%),N-SPT,N1_60,Sigma(kPa),SigmaPrima(kPa),CSR,CRR,FS,Resultado\n';
+            
+            analysisResults.layers.forEach(layer => {
+                csv += `${layer.num},${layer.prof},${layer.density},${layer.finos},${layer.ip},${layer.nspt},${layer.N1_60},${layer.sigma.toFixed(2)},${layer.u.toFixed(2)},${layer.sigmaPrima.toFixed(2)},${layer.CSR.toFixed(4)},${layer.CRR.toFixed(4)},${layer.fs.toFixed(3)},${layer.resultado}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'resultados_licuacion.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
